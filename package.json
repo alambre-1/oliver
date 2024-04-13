@@ -1,0 +1,19 @@
+{
+  "name": "oliver_project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alambre-1/oliver.git"
+  },
+  "author": "Leonel B.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alambre-1/oliver/issues"
+  },
+  "homepage": "https://github.com/alambre-1/oliver#readme"
+}
