@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Year End Countdown with Daily Progress</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .card-title {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .countdown {
+            text-align: center;
+            font-size: 36px;
+            font-family: monospace;
+            color: #444;
+            margin-bottom: 20px;
+        }
+        .progress-container {
+            margin-top: 20px;
+            padding: 10px;
+            border-top: 1px solid #eee;
+        }
+        .progress-title {
+            text-align: center;
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            transition: width 0.5s ease;
+            border-radius: 10px;
+        }
+        .progress-text {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const YearEndCountdown = () => {
+            const [timeLeft, setTimeLeft] = React.useState({
+                days: 0,
+                hours: 0,
+                minutes: 0,
+                seconds: 0
+            });
+            const [dayProgress, setDayProgress] = React.useState({
+                percentage: 0,
+                hoursLeft: 0,
+                minutesLeft: 0
+            });
+
+            React.useEffect(() => {
+                const getTimeUntilYearEnd = () => {
+                    const now = new Date();
+                    const yearEnd = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
+                    const timeDiff = yearEnd - now;
+
+                    return {
+                        days: Math.floor(timeDiff / (1000 * 60 * 60 * 24)),
+                        hours: Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+                        minutes: Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60)),
+                        seconds: Math.floor((timeDiff % (1000 * 60)) / 1000)
+                    };
+                };
+
+                const getDayProgress = () => {
+                    const now = new Date();
+                    const totalSecondsInDay = 24 * 60 * 60;
+                    const secondsElapsed = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+                    const percentage = (secondsElapsed / totalSecondsInDay) * 100;
+                    const secondsLeft = totalSecondsInDay - secondsElapsed;
+                    const hoursLeft = Math.floor(secondsLeft / 3600);
+                    const minutesLeft = Math.floor((secondsLeft % 3600) / 60);
+
+                    return {
+                        percentage,
+                        hoursLeft,
+                        minutesLeft
+                    };
+                };
+
+                // Update immediately
+                setTimeLeft(getTimeUntilYearEnd());
+                setDayProgress(getDayProgress());
+
+                // Update every second
+                const timer = setInterval(() => {
+                    setTimeLeft(getTimeUntilYearEnd());
+                    setDayProgress(getDayProgress());
+                }, 1000);
+
+                // Cleanup interval on component unmount
+                return () => clearInterval(timer);
+            }, []);
+
+            return (
+                <div className="card">
+                    <div className="card-title">Time Until Year End</div>
+                    <div className="countdown">
+                        {timeLeft.days} days{' '}
+                        {String(timeLeft.hours).padStart(2, '0')}:
+                        {String(timeLeft.minutes).padStart(2, '0')}:
+                        {String(timeLeft.seconds).padStart(2, '0')}
+                    </div>
+                    <div className="progress-container">
+                        <div className="progress-title">Today's Progress</div>
+                        <div className="progress-bar">
+                            <div 
+                                className="progress-fill" 
+                                style={{ width: `${dayProgress.percentage}%` }}
+                            />
+                        </div>
+                        <div className="progress-text">
+                            {dayProgress.hoursLeft}h {dayProgress.minutesLeft}m remaining today
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<YearEndCountdown />);
+    </script>
+</body>
+</html>
